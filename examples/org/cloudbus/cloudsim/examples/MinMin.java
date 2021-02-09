@@ -24,38 +24,25 @@ public class MinMin extends DatacenterBroker {
 	public void minMinScheduler() {
 		int nTasks = cloudletList.size(); // Holds number of tasks
 		int nVms = vmList.size(); // Holds number of vms
-		System.out.println("VMSSS = " + nVms);
 		
 		double cTime[][] = new double[nTasks][nVms];
-		double eTime[][] = new double[nTasks][nVms];
-		
-		// Copying over cloudlets
-		
-		ArrayList<Cloudlet> cList = new ArrayList<Cloudlet>();
-		for ( Cloudlet cloudlet: getCloudletList() ) {
-			cList.add(cloudlet);
-		}
-		
-		double time = 0.0;
-		
 		// computing completion and execution time for each cloudlet over each vm
 		for ( int i = 0; i < nTasks; i++ ) {
 			for ( int j = 0; j < nVms; j++ ) {
-				// 
-				cTime[i][j] = getCompletionTime(cList.get(i), vmList.get(i));
-				eTime[i][j] = getExecutionTime(cList.get(i), vmList.get(i));
-				
-				// Technically All tasks should be executed over first VM
+				cTime[i][j] = getCompletionTime(cloudletList.get(i), vmList.get(i));
 			}
 		}
 		
 		printTable(cTime, nTasks, nVms);
 		
+		// In each iteration, find min value and against that value
+		// bind j as a Cloudlet with k as a VM
+		// 0 out that that task for each VM
+		// Repeat the iteration of bind Task with VM according to MinMin algo
 		for ( int i = 0; i < nTasks; i++ ) {
 			int minTask = -1;
 			int minVm = -1;
 			double minCTime = -1.0;
-			System.out.println("Here");
 			for ( int j = 0; j < nTasks; j++ ) {
 				
 				// Search in all VMs
@@ -89,9 +76,6 @@ public class MinMin extends DatacenterBroker {
 			}
 			
 		}
-		
-		// Now for each task, find minimum number and bind task to vm
-		// Reset it's value to 0 to be skipped over next iterations
 	}
 	
 	/**
@@ -104,19 +88,7 @@ public class MinMin extends DatacenterBroker {
 		double waitingTime = cloudlet.getWaitingTime();
 		double execTime = cloudlet.getCloudletLength() / (vm.getMips()*vm.getNumberOfPes());
 		
-		double completionTime = execTime + waitingTime;
-		
-		return completionTime;
-	}
-	
-	/**
-	 * Function to compute execution time for specific cloudlet over specified vm
-	 * @param cloudlet
-	 * @param vm
-	 * @return
-	 */
-	private double getExecutionTime(Cloudlet cloudlet, Vm vm) {
-		return cloudlet.getCloudletLength() / (vm.getMips()*vm.getNumberOfPes());
+		return execTime + waitingTime;
 	}
 
 	private void printTable(double cTime[][], int nTasks, int nVms) {
